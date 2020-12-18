@@ -31,6 +31,7 @@ async function takeScreenshot() {
 
 async function cropImageToBuffer(image, width, height, left, top) {
     return new Promise((resolve, reject) => {
+        console.log(width, height, left, top);
         sharp(image).extract({width, height, left, top}).toBuffer()
             .then(function (imagebuffer) {
                 resolve(imagebuffer);
@@ -62,10 +63,10 @@ async function getText() {
         let screenshot = await takeScreenshot();
         let imageBuffer = await cropImageToBuffer(
             screenshot,
-            positions.bottomRight.x - positions.topLeft.x,
-            positions.bottomRight.y - positions.topLeft.y,
-            positions.topLeft.x,
-            positions.topLeft.y);
+            positions["bottomRight"].x - positions["topLeft"].x,
+            positions["bottomRight"].y - positions["topLeft"].y,
+            positions["topLeft"].x,
+            positions["topLeft"].y);
 
         // Performs text detection on the local file
         const [result] = await client.textDetection(imageBuffer);
@@ -75,8 +76,8 @@ async function getText() {
         detections.forEach(text => {
             if (text.description.toLowerCase() === "guerre") {
                 warlordsPositions.push({
-                    x: text.boundingPoly.vertices[0].x + positions.topLeft.x,
-                    y: text.boundingPoly.vertices[0].y + positions.topLeft.y
+                    x: text.boundingPoly.vertices[0].x + positions["topLeft"].x,
+                    y: text.boundingPoly.vertices[0].y + positions["topLeft"].y
                 });
             }
         });
@@ -117,7 +118,7 @@ async function main() {
                      */
                 }, (Math.random() * 20) + 20)
                 console.log("Click on buy");
-            }, ((Math.random() * 300) + 20)*i);
+            }, ((Math.random() * 500) + 20)*i);
         });
 
         console.log("refreshing the board");
