@@ -2,7 +2,7 @@
   "name": "tftbot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,6 +17,7 @@
     "sharp": "^0.26.3"
   },
   "devDependencies": {
+    "@types/sharp": "^0.26.1",
     "robotjs": "^0.6.0"
   }
 }

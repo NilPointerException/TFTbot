@@ -36,42 +36,33 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var ActionService_1 = require("./src/action/ActionService");
-var DetectionService_1 = require("./src/image/DetectionService");
-var getPositions_1 = require("./src/config/getPositions");
-function main() {
+var savePositions_1 = require("./savePositions");
+function getPositions() {
     return __awaiter(this, void 0, void 0, function () {
-        var positions;
         var _this = this;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, getPositions_1["default"]()];
-                case 1:
-                    positions = _a.sent();
-                    console.log(positions);
-                    setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
-                        var warlordsPositions;
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0: return [4 /*yield*/, DetectionService_1["default"].getPositionsOfWordInRect("guerre", positions.cardsArea)];
-                                case 1:
-                                    warlordsPositions = _a.sent();
-                                    warlordsPositions.forEach(function (warlordPos) {
-                                        warlordPos.x += (Math.random() * 45) - 20;
-                                        warlordPos.y += (Math.random() * 49) - 18;
-                                        ActionService_1["default"].mouseMoveClick(warlordPos);
-                                        console.log("Click on buy");
-                                    });
-                                    console.log("refreshing the board");
-                                    ActionService_1["default"].keyTap("d");
-                                    return [2 /*return*/];
-                            }
-                        });
-                    }); }, 3500);
-                    return [2 /*return*/];
-            }
+            return [2 /*return*/, new Promise(function (resolve) { return __awaiter(_this, void 0, void 0, function () {
+                    var positions, e_1;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                _a.trys.push([0, 1, , 3]);
+                                positions = require("./positions.json");
+                                return [3 /*break*/, 3];
+                            case 1:
+                                e_1 = _a.sent();
+                                return [4 /*yield*/, savePositions_1["default"]()];
+                            case 2:
+                                positions = _a.sent();
+                                return [3 /*break*/, 3];
+                            case 3:
+                                resolve(positions);
+                                return [2 /*return*/];
+                        }
+                    });
+                }); })];
         });
     });
 }
-main();
-//# sourceMappingURL=index.js.map
+exports["default"] = getPositions;
+//# sourceMappingURL=getPositions.js.map

@@ -36,42 +36,55 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var ActionService_1 = require("./src/action/ActionService");
-var DetectionService_1 = require("./src/image/DetectionService");
-var getPositions_1 = require("./src/config/getPositions");
-function main() {
-    return __awaiter(this, void 0, void 0, function () {
-        var positions;
-        var _this = this;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, getPositions_1["default"]()];
-                case 1:
-                    positions = _a.sent();
-                    console.log(positions);
-                    setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
-                        var warlordsPositions;
+var ImageService_1 = require("./ImageService");
+var vision_1 = require("@google-cloud/vision");
+var client = new vision_1["default"].ImageAnnotatorClient();
+/**
+ * Service for image detection
+ */
+var DetectionService = /** @class */ (function () {
+    function DetectionService() {
+    }
+    /**
+     * Returns a list of positions where the input word was found
+     * @param word the word you search
+     * @param rect Rect of scanned zone on the screen
+     * @returns Promise of Vector list, can be empty
+     */
+    DetectionService.getPositionsOfWordInRect = function (word, rect) {
+        if (word === void 0) { word = "guerre"; }
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve) { return __awaiter(_this, void 0, void 0, function () {
+                        var imgBuffer, result, detections, warlordsPositions;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
-                                case 0: return [4 /*yield*/, DetectionService_1["default"].getPositionsOfWordInRect("guerre", positions.cardsArea)];
+                                case 0: return [4 /*yield*/, ImageService_1["default"].getCroppedScreenBuffer(rect)];
                                 case 1:
-                                    warlordsPositions = _a.sent();
-                                    warlordsPositions.forEach(function (warlordPos) {
-                                        warlordPos.x += (Math.random() * 45) - 20;
-                                        warlordPos.y += (Math.random() * 49) - 18;
-                                        ActionService_1["default"].mouseMoveClick(warlordPos);
-                                        console.log("Click on buy");
+                                    imgBuffer = _a.sent();
+                                    return [4 /*yield*/, client.textDetection(imgBuffer)];
+                                case 2:
+                                    result = (_a.sent())[0];
+                                    detections = result.textAnnotations;
+                                    warlordsPositions = [];
+                                    detections.forEach(function (text) {
+                                        if (text.description.toLowerCase().search(word) !== -1) {
+                                            warlordsPositions.push({
+                                                x: text.boundingPoly.vertices[0].x + rect.x,
+                                                y: text.boundingPoly.vertices[0].y + rect.y
+                                            });
+                                        }
                                     });
-                                    console.log("refreshing the board");
-                                    ActionService_1["default"].keyTap("d");
+                                    resolve(warlordsPositions);
                                     return [2 /*return*/];
                             }
                         });
-                    }); }, 3500);
-                    return [2 /*return*/];
-            }
+                    }); })];
+            });
         });
-    });
-}
-main();
-//# sourceMappingURL=index.js.map
+    };
+    return DetectionService;
+}());
+exports["default"] = DetectionService;
+//# sourceMappingURL=DetectionService.js.map
