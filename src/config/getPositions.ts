@@ -1,4 +1,4 @@
-import savePosition from "./savePositions";
+import savePositions from "./savePositions";
 import Rect from "../Rect";
 
 async function getPositions(): Promise<{ cardsArea: Rect }> {
@@ -7,7 +7,7 @@ async function getPositions(): Promise<{ cardsArea: Rect }> {
         try {
             positions = require("./positions.json");
         } catch (e) {
-            positions = await savePosition();
+            positions = await savePositions();
         }
 
         resolve(positions);

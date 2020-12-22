@@ -1,1 +1,5 @@
 node_modules/
+trainingData/validated/
+trainingData/unsorted/
+trainingData/generated/
+tmp/fit_logs_1/

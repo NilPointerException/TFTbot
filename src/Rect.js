@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var Rect = /** @class */ (function () {
     function Rect(x, y, width, height) {
         this.x = x;
@@ -9,5 +9,4 @@ var Rect = /** @class */ (function () {
     }
     return Rect;
 }());
-exports["default"] = Rect;
-//# sourceMappingURL=Rect.js.map
+exports.default = Rect;

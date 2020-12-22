@@ -1,12 +1,11 @@
 import Action from "./Action";
-// @ts-ignore
-import robot from "robotjs";
+import * as robot from "robotjs";
 import ActionMouseMove from "./ActionMouseMove";
 import ActionMouseClick from "./ActionMouseClick";
-// @ts-ignore
-import ghostCursor from "ghost-cursor";
+import * as ghostCursor from "ghost-cursor";
 import Vector from "../Vector";
 import ActionKeyTap from "./ActionKeyTap";
+import ActionMouseCreatePath from "./ActionMouseCreatePath";
 
 robot.setMouseDelay(0);
 robot.setKeyboardDelay(0);
@@ -15,29 +14,39 @@ robot.setKeyboardDelay(0);
  * Use it to push actions that the service will execute in its own loop
  */
 export default class ActionService {
-    static actions: Action[] = [];
+    static actions: any[] = [];
+    static lastPosition: Vector = robot.getMousePos();
 
     /**
      * Pushes an action at the end of the action stack
      * @param action can be either Action or Array<Action>
      */
-    static push(action: Action | Action[]): void {
-        if (action instanceof Action) {
-            this.actions.push(action);
+    static push(action: any): void {
+        if (action.length === undefined) {
+            ActionService.actions.push(action);
         } else {
-            this.actions.push(...action);
+            ActionService.actions.push(...action);
         }
     }
 
     static actionLoop(): void {
-        const action = this.actions.shift();
-        if (action) {
-            if (action instanceof ActionMouseMove) {
+        const action = ActionService.actions.shift();
+        if (!!action) {
+            if (Action.ActionType.MOUSE_MOVE === action.type) {
                 robot.moveMouse(action.pos.x, action.pos.y);
-            } else if (action instanceof ActionMouseClick) {
+                ActionService.lastPosition = action.pos;
+            } else if (Action.ActionType.MOUSE_LEFT_CLICK === action.type) {
                 robot.mouseClick();
-            }else if(action instanceof ActionKeyTap){
+            }else if (Action.ActionType.MOUSE_LEFT_TOGGLE === action.type) {
+                robot.mouseToggle();
+            } else if (Action.ActionType.KEY_TAP === action.type) {
                 robot.keyTap(action.key);
+            } else if (Action.ActionType.CREATE_PATH === action.type) {
+                const route = ghostCursor.path(robot.getMousePos(), action.pos);
+                const acts: ActionMouseMove[] = route.map((r: Vector) =>
+                    new ActionMouseMove(r)
+                );
+                ActionService.actions.unshift(...acts);
             }
         }
     }
@@ -48,8 +57,7 @@ export default class ActionService {
      * @param to position as Vector
      */
     static mouseMove(to: Vector) {
-        const route = ghostCursor.path(robot.getMousePos(), to);
-        this.actions.push(route.map((r) => new ActionMouseMove(r)));
+        ActionService.push(new ActionMouseCreatePath(to));
     }
 
     /**
@@ -57,18 +65,18 @@ export default class ActionService {
      * @param to position as Vector
      */
     static mouseMoveClick(to: Vector) {
-        this.mouseMove(to);
-        this.actions.push(new ActionMouseClick());
+        ActionService.mouseMove(to);
+        ActionService.push(new ActionMouseClick());
     }
 
     /**
      * Executes a single key tap
      * @param key as a string (e.g. "d" for the letter D)
      */
-    static keyTap(key: string){
-        this.actions.push(new ActionKeyTap(key));
+    static keyTap(key: string) {
+        ActionService.push(new ActionKeyTap(key));
     }
 }
 
 // Starts the action loop for the service
-setInterval(ActionService.actionLoop, 16);
+setInterval(ActionService.actionLoop, 10);

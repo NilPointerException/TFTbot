@@ -2,7 +2,8 @@ enum ActionType {
     MOUSE_MOVE,
     MOUSE_LEFT_CLICK,
     MOUSE_LEFT_TOGGLE,
-    KEY_TAP
+    KEY_TAP,
+    CREATE_PATH
 }
 
 /**
@@ -10,5 +11,5 @@ enum ActionType {
  */
 export default class Action {
     static ActionType = ActionType; // exposes ActionType enum through Action static class
-    type: ActionType;
+    type: ActionType | null = null;
 }

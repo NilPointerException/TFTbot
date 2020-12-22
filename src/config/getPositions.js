@@ -35,8 +35,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
-var savePositions_1 = require("./savePositions");
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var savePositions_1 = __importDefault(require("./savePositions"));
 function getPositions() {
     return __awaiter(this, void 0, void 0, function () {
         var _this = this;
@@ -51,7 +54,7 @@ function getPositions() {
                                 return [3 /*break*/, 3];
                             case 1:
                                 e_1 = _a.sent();
-                                return [4 /*yield*/, savePositions_1["default"]()];
+                                return [4 /*yield*/, savePositions_1.default()];
                             case 2:
                                 positions = _a.sent();
                                 return [3 /*break*/, 3];
@@ -64,5 +67,4 @@ function getPositions() {
         });
     });
 }
-exports["default"] = getPositions;
-//# sourceMappingURL=getPositions.js.map
+exports.default = getPositions;

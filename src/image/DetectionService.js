@@ -35,10 +35,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
-var ImageService_1 = require("./ImageService");
-var vision_1 = require("@google-cloud/vision");
-var client = new vision_1["default"].ImageAnnotatorClient();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var ImageService_1 = __importDefault(require("./ImageService"));
+var vision_1 = __importDefault(require("@google-cloud/vision"));
+var client = new vision_1.default.ImageAnnotatorClient();
 /**
  * Service for image detection
  */
@@ -60,7 +63,7 @@ var DetectionService = /** @class */ (function () {
                         var imgBuffer, result, detections, warlordsPositions;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
-                                case 0: return [4 /*yield*/, ImageService_1["default"].getCroppedScreenBuffer(rect)];
+                                case 0: return [4 /*yield*/, ImageService_1.default.getCroppedScreenBuffer(rect)];
                                 case 1:
                                     imgBuffer = _a.sent();
                                     return [4 /*yield*/, client.textDetection(imgBuffer)];
@@ -86,5 +89,4 @@ var DetectionService = /** @class */ (function () {
     };
     return DetectionService;
 }());
-exports["default"] = DetectionService;
-//# sourceMappingURL=DetectionService.js.map
+exports.default = DetectionService;

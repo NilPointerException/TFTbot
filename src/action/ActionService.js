@@ -1,15 +1,36 @@
 "use strict";
-exports.__esModule = true;
-var Action_1 = require("./Action");
-// @ts-ignore
-var robotjs_1 = require("robotjs");
-var ActionMouseMove_1 = require("./ActionMouseMove");
-var ActionMouseClick_1 = require("./ActionMouseClick");
-// @ts-ignore
-var ghost_cursor_1 = require("ghost-cursor");
-var ActionKeyTap_1 = require("./ActionKeyTap");
-robotjs_1["default"].setMouseDelay(0);
-robotjs_1["default"].setKeyboardDelay(0);
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Action_1 = __importDefault(require("./Action"));
+var robot = __importStar(require("robotjs"));
+var ActionMouseMove_1 = __importDefault(require("./ActionMouseMove"));
+var ActionMouseClick_1 = __importDefault(require("./ActionMouseClick"));
+var ghostCursor = __importStar(require("ghost-cursor"));
+var ActionKeyTap_1 = __importDefault(require("./ActionKeyTap"));
+var ActionMouseCreatePath_1 = __importDefault(require("./ActionMouseCreatePath"));
+robot.setMouseDelay(0);
+robot.setKeyboardDelay(0);
 /**
  * Handles the execution of actions
  * Use it to push actions that the service will execute in its own loop
@@ -23,24 +44,36 @@ var ActionService = /** @class */ (function () {
      */
     ActionService.push = function (action) {
         var _a;
-        if (action instanceof Action_1["default"]) {
-            this.actions.push(action);
+        if (action.length === undefined) {
+            ActionService.actions.push(action);
         }
         else {
-            (_a = this.actions).push.apply(_a, action);
+            (_a = ActionService.actions).push.apply(_a, action);
         }
     };
     ActionService.actionLoop = function () {
-        var action = this.actions.shift();
-        if (action) {
-            if (action instanceof ActionMouseMove_1["default"]) {
-                robotjs_1["default"].moveMouse(action.pos.x, action.pos.y);
+        var _a;
+        var action = ActionService.actions.shift();
+        if (!!action) {
+            if (Action_1.default.ActionType.MOUSE_MOVE === action.type) {
+                robot.moveMouse(action.pos.x, action.pos.y);
+                ActionService.lastPosition = action.pos;
             }
-            else if (action instanceof ActionMouseClick_1["default"]) {
-                robotjs_1["default"].mouseClick();
+            else if (Action_1.default.ActionType.MOUSE_LEFT_CLICK === action.type) {
+                robot.mouseClick();
             }
-            else if (action instanceof ActionKeyTap_1["default"]) {
-                robotjs_1["default"].keyTap(action.key);
+            else if (Action_1.default.ActionType.MOUSE_LEFT_TOGGLE === action.type) {
+                robot.mouseToggle();
+            }
+            else if (Action_1.default.ActionType.KEY_TAP === action.type) {
+                robot.keyTap(action.key);
+            }
+            else if (Action_1.default.ActionType.CREATE_PATH === action.type) {
+                var route = ghostCursor.path(robot.getMousePos(), action.pos);
+                var acts = route.map(function (r) {
+                    return new ActionMouseMove_1.default(r);
+                });
+                (_a = ActionService.actions).unshift.apply(_a, acts);
             }
         }
     };
@@ -50,28 +83,27 @@ var ActionService = /** @class */ (function () {
      * @param to position as Vector
      */
     ActionService.mouseMove = function (to) {
-        var route = ghost_cursor_1["default"].path(robotjs_1["default"].getMousePos(), to);
-        this.actions.push(route.map(function (r) { return new ActionMouseMove_1["default"](r); }));
+        ActionService.push(new ActionMouseCreatePath_1.default(to));
     };
     /**
      * Moves the mouse to the specified position then clicks
      * @param to position as Vector
      */
     ActionService.mouseMoveClick = function (to) {
-        this.mouseMove(to);
-        this.actions.push(new ActionMouseClick_1["default"]());
+        ActionService.mouseMove(to);
+        ActionService.push(new ActionMouseClick_1.default());
     };
     /**
      * Executes a single key tap
      * @param key as a string (e.g. "d" for the letter D)
      */
     ActionService.keyTap = function (key) {
-        this.actions.push(new ActionKeyTap_1["default"](key));
+        ActionService.push(new ActionKeyTap_1.default(key));
     };
     ActionService.actions = [];
+    ActionService.lastPosition = robot.getMousePos();
     return ActionService;
 }());
-exports["default"] = ActionService;
+exports.default = ActionService;
 // Starts the action loop for the service
-setInterval(ActionService.actionLoop, 16);
-//# sourceMappingURL=ActionService.js.map
+setInterval(ActionService.actionLoop, 10);

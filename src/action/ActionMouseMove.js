@@ -12,8 +12,11 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-exports.__esModule = true;
-var Action_1 = require("./Action");
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Action_1 = __importDefault(require("./Action"));
 /**
  * Represents a client mouse movement
  */
@@ -21,11 +24,10 @@ var ActionMouseMove = /** @class */ (function (_super) {
     __extends(ActionMouseMove, _super);
     function ActionMouseMove(pos) {
         var _this = _super.call(this) || this;
-        _this.type = Action_1["default"].ActionType.MOUSE_MOVE;
+        _this.type = Action_1.default.ActionType.MOUSE_MOVE;
         _this.pos = pos;
         return _this;
     }
     return ActionMouseMove;
-}(Action_1["default"]));
-exports["default"] = ActionMouseMove;
-//# sourceMappingURL=ActionMouseMove.js.map
+}(Action_1.default));
+exports.default = ActionMouseMove;

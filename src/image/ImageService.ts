@@ -1,7 +1,8 @@
-import screenshot from "screenshot-desktop";
 // @ts-ignore
+import screenshot from "screenshot-desktop";
 import sharp from "sharp";
 import Rect from "../Rect";
+import fs from "fs";
 
 /**
  * Service for screenshot and cropping
@@ -14,9 +15,26 @@ export default class ImageService {
         return new Promise(async (resolve, reject) => {
             screenshot({format: 'png'}).then((img: Buffer) => {
                 resolve(img);
-            }).catch((err) => {
+            }).catch((err: any) => {
                 reject(err);
             })
+        });
+    }
+
+    static saveImageBufferToFile(imgBuffer: Buffer, path: string): void {
+        fs.writeFileSync(path, imgBuffer);
+    }
+
+    static saveScreenRectToFile(rect: Rect, path: string): void {
+        ImageService.getScreenRect(rect).then((imgBuffer: Buffer) => {
+            ImageService.saveImageBufferToFile(imgBuffer, path);
+        });
+    }
+
+    static async getScreenRect(rect: Rect): Promise<Buffer> {
+        return new Promise(async (resolve) => {
+            const imgBuffer: Buffer = await ImageService.cropImageToBuffer(await ImageService.takeScreenshot(), rect);
+            resolve(imgBuffer);
         });
     }
 
@@ -27,7 +45,6 @@ export default class ImageService {
      */
     static async cropImageToBuffer(image: Buffer, rect: Rect): Promise<Buffer> {
         return new Promise((resolve, reject) => {
-            console.log(rect.width, rect.height, rect.x, rect.y);
             sharp(image).extract({
                 width: rect.width,
                 height: rect.height,
@@ -37,7 +54,6 @@ export default class ImageService {
                 .toBuffer()
                 .then((imageBuffer: Buffer) => {
                     resolve(imageBuffer);
-                    console.log("Image cropped");
                 })
                 .catch((err: Error) => {
                     console.log("An error occured: " + err);

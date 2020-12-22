@@ -35,10 +35,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
-var screenshot_desktop_1 = require("screenshot-desktop");
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 // @ts-ignore
-var sharp_1 = require("sharp");
+var screenshot_desktop_1 = __importDefault(require("screenshot-desktop"));
+var sharp_1 = __importDefault(require("sharp"));
+var fs_1 = __importDefault(require("fs"));
 /**
  * Service for screenshot and cropping
  */
@@ -54,12 +58,42 @@ var ImageService = /** @class */ (function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
-                            screenshot_desktop_1["default"]({ format: 'png' }).then(function (img) {
+                            screenshot_desktop_1.default({ format: 'png' }).then(function (img) {
                                 resolve(img);
-                            })["catch"](function (err) {
+                            }).catch(function (err) {
                                 reject(err);
                             });
                             return [2 /*return*/];
+                        });
+                    }); })];
+            });
+        });
+    };
+    ImageService.saveImageBufferToFile = function (imgBuffer, path) {
+        fs_1.default.writeFileSync(path, imgBuffer);
+    };
+    ImageService.saveScreenRectToFile = function (rect, path) {
+        ImageService.getScreenRect(rect).then(function (imgBuffer) {
+            ImageService.saveImageBufferToFile(imgBuffer, path);
+        });
+    };
+    ImageService.getScreenRect = function (rect) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve) { return __awaiter(_this, void 0, void 0, function () {
+                        var imgBuffer, _a, _b;
+                        return __generator(this, function (_c) {
+                            switch (_c.label) {
+                                case 0:
+                                    _b = (_a = ImageService).cropImageToBuffer;
+                                    return [4 /*yield*/, ImageService.takeScreenshot()];
+                                case 1: return [4 /*yield*/, _b.apply(_a, [_c.sent(), rect])];
+                                case 2:
+                                    imgBuffer = _c.sent();
+                                    resolve(imgBuffer);
+                                    return [2 /*return*/];
+                            }
                         });
                     }); })];
             });
@@ -74,8 +108,7 @@ var ImageService = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) {
-                        console.log(rect.width, rect.height, rect.x, rect.y);
-                        sharp_1["default"](image).extract({
+                        sharp_1.default(image).extract({
                             width: rect.width,
                             height: rect.height,
                             left: rect.x,
@@ -84,8 +117,8 @@ var ImageService = /** @class */ (function () {
                             .toBuffer()
                             .then(function (imageBuffer) {
                             resolve(imageBuffer);
-                            console.log("Image cropped");
-                        })["catch"](function (err) {
+                        })
+                            .catch(function (err) {
                             console.log("An error occured: " + err);
                             reject(err);
                         });
@@ -122,5 +155,4 @@ var ImageService = /** @class */ (function () {
     };
     return ImageService;
 }());
-exports["default"] = ImageService;
-//# sourceMappingURL=ImageService.js.map
+exports.default = ImageService;
